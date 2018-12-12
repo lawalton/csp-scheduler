@@ -73,14 +73,27 @@ def find_next_node(csp, assignment):
         if course not in assignment:
             return course
     return False
-    
+
+def select_most_constraining_variable(csp, assignment):
+    # select the course that has the largest number of students
+    # the more students, the fewer room options
+    largest_course = None
+    max_num_students = float("-inf")
+    for course in csp.courses:
+        num_students = csp.courses[course][2]
+        if (course not in assignment) and (num_students > max_num_students):
+            largest_course = course
+            max_num_students = num_students
+
+    return largest_course
+           
 def recursive_backtracking(assignment, csp):
     # Your code here #
     csp.cost = csp.cost + 1
     if len(assignment) == len(csp.courses):
         return assignment
 
-    course = find_next_node(csp, assignment)
+    course = select_most_constraining_variable(csp, assignment)
 
     for final_date in csp.domain:
         if check_constraints(course, final_date, csp, assignment):
