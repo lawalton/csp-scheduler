@@ -8,29 +8,6 @@ class CSP:
         self.num_backtrack = 0
         self.cost = 0
 
-"""
-considerations for the final exam scheduler:
-- day - provide monday-friday list of variables
-- time - 8am - 7pm?
-    - pick a length of time to assume all finals - 1 hour? 2 hours?
-- room size 
-- can't have classes at the different times have finals at the same time
-"""
-
-"""
-list/dictionary of rooms
-room name - occupancy
-{"ECEE 156": 130, "MATH 100": 200}
-
-list of classes: info needed:
-    name, time, number of students
-"""
-
-"""
-domain - date/time combos
-["M", 9], ["M", 10], etc. 
-"""
-
 def backtracking_search(csp):
     return recursive_backtracking(OrderedDict(), csp)
 
@@ -88,14 +65,14 @@ def select_most_constraining_variable(csp, assignment):
     return largest_course
            
 def recursive_backtracking(assignment, csp):
-    # Your code here #
-    csp.cost = csp.cost + 1
+
     if len(assignment) == len(csp.courses):
         return assignment
 
     course = select_most_constraining_variable(csp, assignment)
 
     for final_date in csp.domain:
+        csp.cost = csp.cost + 1
         if check_constraints(course, final_date, csp, assignment):
             print("Assigned ", course, "to", final_date)
             assignment[course] = final_date
@@ -113,7 +90,7 @@ def recursive_backtracking(assignment, csp):
 days = ["M"]
 #times = [8, 10, 12, 2, 4]
 times = [8, 10, 12]
-rooms = {"CHEM 140": 400, "ECEE 156": 130, "MATH 100": 250, "HLMS 70": 150}
+rooms = {"CHEM 140": 400, "ECEE 156": 130, "MATH 100": 250}
 domain = []
 for day in days:
     for time in times:
@@ -131,7 +108,28 @@ courses = OrderedDict([
     ("APPM 1300", ["T", 12, 200])
  ])
 
-csp = CSP(courses, rooms, domain)
+courses_desc = OrderedDict([
+    ("PHYS 1000", ["M", 4, 360]),
+    ("CSCI 2270", ["T", 12, 350]),
+    ("APPM 1300", ["T", 12, 200]),
+    ("CSCI 1300", ["M", 1, 170]),
+    ("APPM 1400", ["M", 1, 130]),
+    ("CSCI 3202", ["M", 4, 70])
+
+ ])
+
+courses_asc = OrderedDict([
+    ("CSCI 3202", ["M", 4, 70]), 
+    ("APPM 1400", ["M", 1, 130]),
+    ("CSCI 1300", ["M", 1, 170]),
+    ("APPM 1300", ["T", 12, 200]),
+    ("CSCI 2270", ["T", 12, 350]),
+    ("PHYS 1000", ["M", 4, 360])
+   ])
+
+#csp = CSP(courses, rooms, domain)
+#csp = CSP(courses_desc, rooms, domain)
+csp = CSP(courses_asc, rooms, domain)
 a = backtracking_search(csp)
 print("=================")
 print(a)

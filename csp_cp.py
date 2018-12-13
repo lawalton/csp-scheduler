@@ -8,9 +8,24 @@ class CSP:
         self.num_backtrack = 0
         self.cost = 0
 
-
 def backtracking_search(csp):
+    constraint_propagation(csp)
     return recursive_backtracking(OrderedDict(), csp)
+
+def constraint_propagation(csp):
+    for course in csp.courses:
+        course_domain = csp.courses[course][3]
+        new_domain = []
+        for assignment in course_domain:
+            room_name = assignment[2]
+            room_occupancy = csp.rooms[room_name]
+            num_students = csp.courses[course][2]
+
+            if room_occupancy >= num_students:
+                # viable option
+                new_domain.append(assignment)
+
+        csp.courses[course][3] = new_domain
 
 def check_constraints(course, final_assignment, csp, assignment):
     # check room size
@@ -59,7 +74,9 @@ def recursive_backtracking(assignment, csp):
 
     course = find_next_node(csp, assignment)
 
-    for final_date in csp.domain:
+    course_domain = csp.courses[course][3]
+
+    for final_date in course_domain:
         csp.cost = csp.cost + 1
         if check_constraints(course, final_date, csp, assignment):
             assignment[course] = final_date
@@ -111,10 +128,21 @@ courses_asc = OrderedDict([
     ("CSCI 2270", ["T", 12, 350]),
     ("PHYS 1000", ["M", 4, 360])
    ])
+# for constraint propagation, each course gets its own list of domains
+# so you don't have to cycle through the ones that don't work
+for course in courses:
+    courses[course].append(domain)
+
+for course in courses_desc:
+    courses_desc[course].append(domain)
+
+for course in courses_asc:
+    courses_asc[course].append(domain)
 
 #csp = CSP(courses, rooms, domain)
 #csp = CSP(courses_desc, rooms, domain)
 csp = CSP(courses_asc, rooms, domain)
+
 a = backtracking_search(csp)
 print("=================")
 print(a)
